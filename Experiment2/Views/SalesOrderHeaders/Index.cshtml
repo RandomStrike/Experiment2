@@ -1,0 +1,179 @@
+﻿@model IEnumerable<Experiment2.Models.ReportModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="~/Content/bootstrap.css">
+    <link rel="stylesheet" href="~/Content/Site.css">
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+
+<h2>Sales Orders</h2>
+
+Start Date:
+<input type='text' id="StartDate" value=@HttpContext.Current.Session["StartDate"].ToString() onblur="SaveStartdate(this.value)" />
+
+End Date:
+<input type='text' id="EndDate" value=@HttpContext.Current.Session["EndDate"].ToString() onblur="SaveEnddate(this.value)" />
+
+<div>
+    @Html.ActionLink("Refresh Sales Order List", "Index", "SalesOrderHeaders")<br />
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.SoldBy)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SoldTo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AccountNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.InvoiceNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PurchaseOrderNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DueDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalDue)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LineTotal)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoldBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoldTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InvoiceNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurchaseOrderNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalDue)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LineTotal)
+            </td>
+        </tr>
+    }
+
+</table>
+
+<script>
+    function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+    }
+
+    function isValidDate(date) {
+        var matches = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/.exec(date);
+        if (matches == null) return false;
+        var d = matches[2];
+        var m = matches[1] - 1;
+        var y = matches[3];
+        var composedDate = new Date(y, m, d);
+        return composedDate.getDate() == d &&
+            composedDate.getMonth() == m &&
+            composedDate.getFullYear() == y;
+    }
+
+    function SaveStartdate(val) {
+        if (isValidDate(val)) {
+            $.ajax({
+                type: 'POST',
+                url: '/SalesOrderHeaders/SetStartDate',
+                data: {
+                    __RequestVerificationToken: gettoken(),
+                    startdate: val
+                },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                success: function (data) {
+                    alert("here" + data.d.toString());
+                },
+                error: function () {
+                    alert("error");
+                }
+                });
+        }
+        else {
+            alert("invalid date")
+        }
+    }
+
+    function SaveEnddate(val) {
+        if (isValidDate(val)) {
+            $.ajax({
+                type: 'POST',
+                url: '/SalesOrderHeaders/SetEndDate',
+                data: {
+                    __RequestVerificationToken: gettoken(),
+                    enddate: val
+                },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                success: function (data) {
+                    alert("here" + data.d.toString());
+                },
+                error: function () {
+                    alert("error");
+                }
+                });
+        }
+        else {
+            alert("invalid date")
+        }
+    }
+
+</script>
